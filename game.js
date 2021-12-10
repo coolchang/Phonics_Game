@@ -72,6 +72,9 @@ class bootGame extends Phaser.Scene{
         this.load.image('bomb', 'assets/bomb.png');
         //this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
         this.load.spritesheet('dude', 'assets/befly_running.png', { frameWidth: 32, frameHeight: 48 });
+
+        //this.load.audio("grow", ["assets/sounds/grow.ogg", "assets/sounds/grow.mp3"]);
+        this.load.audio("a_sound", ["assets/sounds/a_for_car.wav"]);
     }
     create(){
         this.scene.start("playGame");
@@ -111,7 +114,7 @@ class playGame extends Phaser.Scene{
     platforms.create(-7, 130, 'ground');
 
     // The player and its settings
-    player = this.physics.add.sprite(100, 450, 'dude');
+    player = this.physics.add.sprite(100, 300, 'dude');
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
@@ -170,6 +173,9 @@ class playGame extends Phaser.Scene{
 
     this.physics.add.collider(player, bombs, hitBomb, null, this);
 
+    //this.growSound = this.sound.add("grow");
+    this.a_sound = this.sound.add("a_sound");
+
     }
    
     
@@ -214,6 +220,9 @@ function collectStar (player, star) {
     //  Add and update the score
     score += 10;
     scoreText.setText('Score: ' + score);
+
+    //this.growSound.play();
+    this.a_sound.play();
 
     if (stars.countActive(true) === 0)
     {
