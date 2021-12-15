@@ -72,8 +72,10 @@ class bootGame extends Phaser.Scene{
         this.load.image('star', 'assets/a_Captial_small.png');
         this.load.image('bomb', 'assets/bomb.png');
         //this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-        this.load.spritesheet('dude', 'assets/befly_running.png', { frameWidth: 32, frameHeight: 48 });
+        this.load.spritesheet('dude', 'assets/befly1_2_running.png', { frameWidth: 32, frameHeight: 48 });
 
+      
+        
         //this.load.audio("grow", ["assets/sounds/grow.ogg", "assets/sounds/grow.mp3"]);
         this.load.audio("a_sound", ["assets/sounds/a_for_car.wav"]);
     }
@@ -89,7 +91,7 @@ var stars;
 var bombs;
 var platforms;
 var cursors;
-var keys;
+var keys_pressed;
 var score = 0;
 var gameOver = false;
 var scoreText;
@@ -120,45 +122,25 @@ class playGame extends Phaser.Scene{
     platforms.create(-7, 130, 'ground').setScale(0.3).refreshBody();
 
     // The player and its settings
-    player = this.physics.add.sprite(100, 300, 'dude');
+    player = this.physics.add.sprite(100, 300, 'dude');   
+    // The player2 and its settings   
+    player2 = this.physics.add.sprite(700, 300, 'dude');
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
 
+        
+    //  Player2 physics properties. Give the little guy a slight bounce.
 
-    // The player2 and its settings
-    player2 = this.physics.add.sprite(500, 300, 'dude');
     player2.setBounce(0.2);
     player2.setCollideWorldBounds(true);
 
 
     // The player2 and its W.A.S.D Keys settings
-    this.keys = this.input.keyboard.addKeys("W,A,S,D");
+    this.keys_pressed = this.input.keyboard.addKeys("W,A,S,D");
 
 
-
-
-    //  Our player2 animations, turning, walking left and walking right.
-    this.anims.create({
-        key: 'a',
-        frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-        frameRate: 30,
-        repeat: -1
-    });
-   
-    this.anims.create({
-        key: 'turn',
-        frames: [ { key: 'dude', frame: 4 } ],
-        frameRate: 20
-    });
-
-    this.anims.create({
-        key: 'd',
-        frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-        frameRate: 10,
-        repeat: -1
-    });
 
 
 
@@ -183,11 +165,63 @@ class playGame extends Phaser.Scene{
         repeat: -1
     });
 
+    //  Our player2 animations, turning, walking left and walking right.
+    this.anims.create({
+        key: 'a',
+        frames: this.anims.generateFrameNumbers('dude', { start: 9, end: 12 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'turn2',
+        frames: [ { key: 'dude', frame: 13 } ],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'd',
+        frames: this.anims.generateFrameNumbers('dude', { start: 14, end: 17 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
-    //keys = this.input.keyboard.
 
-    //console.log(keys);
+
+    //this.keys_pressed = this.input.keyboard.on(); 
+
+    this.input.keyboard.on('keydown_A', function (event) {
+
+       console.log("A is pressed");
+       keys_pressed = "a";
+   
+    });
+
+    this.input.keyboard.on('keydown_D', function (event) {
+
+        console.log("D is pressed");
+        keys_pressed = "d";
+   
+    });
+
+    this.input.keyboard.on('keydown_W', function (event) {
+
+        console.log("W is pressed");
+        keys_pressed = "w";
+    
+     });
+
+     this.input.keyboard.on('keydown_S', function (event) {
+
+        console.log("S is pressed");
+        keys_pressed = "s";
+    
+     });
+
+    //console.log(keys_pressed);
 
     //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
     stars = this.physics.add.group({
@@ -218,6 +252,7 @@ class playGame extends Phaser.Scene{
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
     //  Collide the player and the stars with the platforms
+    
     this.physics.add.collider(player, platforms);    
     this.physics.add.collider(stars, platforms);
     this.physics.add.collider(bombs, platforms);
@@ -237,7 +272,7 @@ class playGame extends Phaser.Scene{
     this.physics.add.overlap(player2, stars, collectStar, null, this);
     this.physics.add.collider(player2, bombs, hitBomb, null, this);
 
-
+    this.physics.add.collider(player, player2);   
 
     //this.growSound = this.sound.add("grow");
     this.a_sound = this.sound.add("a_sound");
@@ -280,6 +315,37 @@ class playGame extends Phaser.Scene{
         }
 
 
+        // Player 2 용 커서 
+
+        if (keys_pressed == 'a')
+        {
+            player2.setVelocityX(-160);
+    
+            player2.anims.play('a', true);
+        }
+        else if (keys_pressed == 'd')
+        {
+            player2.setVelocityX(160);
+    
+            player2.anims.play('d', true);
+        }
+        else
+        {
+            player2.setVelocityX(0);
+    
+            player2.anims.play('turn2');
+        }
+    
+        if (keys_pressed == 'w' && player2.body.touching.down)
+        {
+            player2.setVelocityY(-330);
+        }
+
+
+
+
+
+        /*
         
         this.input.keyboard.on('keydown_A', function (event) {
 
@@ -300,7 +366,7 @@ class playGame extends Phaser.Scene{
        
         });
 
-        
+  */      
 
     }
 }
