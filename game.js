@@ -10,6 +10,24 @@ var gameOptions = {
 }
 
 
+var player;
+var player2;
+var stars;
+var bombs;
+var platforms;
+var cursors;
+var keys_pressed;
+var score = 0;
+var score_player2 = 0;
+var gameOver = false;
+var scoreText;
+var scoreText_player2;
+
+var fx;
+
+var button;
+
+
 window.onload = function() {
     var gameConfig = {
         width: gameOptions.screenWidth,        
@@ -56,6 +74,9 @@ function resizeGame(){
         canvas.style.width = (windowHeight * gameRatio) + "px";
         canvas.style.height = windowHeight + "px";
     }
+
+    //this.a_sound.play();
+    this.fx.play();
 }
 
 
@@ -78,6 +99,12 @@ class bootGame extends Phaser.Scene{
         
         //this.load.audio("grow", ["assets/sounds/grow.ogg", "assets/sounds/grow.mp3"]);
         this.load.audio("a_sound", ["assets/sounds/a_for_car.wav"]);
+
+        // game.load.audio('sfx', [ 'assets/audio/SoundEffects/fx_mixdown.mp3', 'assets/audio/SoundEffects/fx_mixdown.ogg' ]);
+        //this.load.audio('sfx', 'assets/audio/SoundEffects/fx_mixdown.ogg');
+
+        this.load.audio("sfx", ["assets/audio/SoundEffects/fx_mixdown.ogg", "assets/audio/SoundEffects/fx_mixdown.mp3"]);
+
     }
     create(){
         this.scene.start("playGame");
@@ -85,16 +112,6 @@ class bootGame extends Phaser.Scene{
 }
 
 
-var player;
-var player2;
-var stars;
-var bombs;
-var platforms;
-var cursors;
-var keys_pressed;
-var score = 0;
-var gameOver = false;
-var scoreText;
 
 class playGame extends Phaser.Scene{
     constructor(){
@@ -244,12 +261,15 @@ class playGame extends Phaser.Scene{
 
     var bomb = bombs.create(10, 16, 'bomb');
     bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    bomb.setCollideWorldBounds(true);
+    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
         //bomb.allowGravity = false;
 
     //  The score
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+    scoreText = this.add.text(16, 16, 'P1 score: 0', { fontSize: '32px', fill: '#000' });
+
+     //  The score for Player 2
+     scoreText_player2 = this.add.text(500, 16, 'P2 score: 0', { fontSize: '32px', fill: '#000' });
 
     //  Collide the player and the stars with the platforms
     
@@ -269,7 +289,7 @@ class playGame extends Phaser.Scene{
     this.physics.add.collider(player2, platforms);
 
     //  Checks to see if the player2 overlaps with any of the stars, if he does call the collectStar function
-    this.physics.add.overlap(player2, stars, collectStar, null, this);
+    this.physics.add.overlap(player2, stars, collectStar_player2, null, this);
     this.physics.add.collider(player2, bombs, hitBomb, null, this);
 
     this.physics.add.collider(player, player2);   
@@ -277,7 +297,47 @@ class playGame extends Phaser.Scene{
     //this.growSound = this.sound.add("grow");
     this.a_sound = this.sound.add("a_sound");
 
-    }
+
+
+
+    //	Here we set-up our audio sprite
+	//this.fx = this.add.audio('sfx');
+    //this.fx.allowMultiple = true;
+
+
+    this.fx = this.sound.add("sfx");
+    this.fx.allowMultiple = true;
+
+    //	And this defines the markers.
+
+	//	They consist of a key (for replaying), the time the sound starts and the duration, both given in seconds.
+	//	You can also set the volume and loop state, although we don't use them in this example (see the docs)
+
+	this.fx.addMarker('alien death', 1, 1.0);
+	this.fx.addMarker('boss hit', 3, 0.5);
+	this.fx.addMarker('escape', 4, 3.2);
+	this.fx.addMarker('meow', 8, 0.5);
+	this.fx.addMarker('numkey', 9, 0.1);
+	this.fx.addMarker('ping', 10, 1.0);
+	this.fx.addMarker('death', 12, 4.2);
+	this.fx.addMarker('shot', 17, 1.0);
+	this.fx.addMarker('squit', 19, 0.3);
+
+
+    /*
+	//	Make some buttons to trigger the sounds
+	makeButton('alien death', 600, 100);
+	makeButton('boss hit', 600, 140);
+	makeButton('escape', 600, 180);
+	makeButton('meow', 600, 220);
+	makeButton('numkey', 600, 260);
+	makeButton('ping', 600, 300);
+	makeButton('death', 600, 340);
+	makeButton('shot', 600, 380);
+	makeButton('squit', 600, 420);
+
+    */
+}
    
     
 
@@ -370,17 +430,41 @@ class playGame extends Phaser.Scene{
 
     }
 }
+/*
+
+function makeButton(name, x, y) {
+
+    button = game.add.button(x, y, 'button', click, this, 0, 1, 2);
+    button.name = name;
+    button.scale.set(2, 1.5);
+    button.smoothed = false;
+
+    var text = game.add.bitmapText(x, y + 7, 'nokia', name, 16);
+    text.x += (button.width / 2) - (text.textWidth / 2);
+
+}
 
 
+
+function click(button) {
+
+	this.fx.play(button.name);
+
+}
+
+*/
+
+// collectStar for player 1
 function collectStar (player, star) {
     star.disableBody(true, true);
 
     //  Add and update the score
     score += 10;
-    scoreText.setText('Score: ' + score);
+    scoreText.setText('P1 Score: ' + score);
 
     //this.growSound.play();
     this.a_sound.play();
+    //this.fx.play();
 
     if (stars.countActive(true) === 0)
     {
@@ -401,6 +485,39 @@ function collectStar (player, star) {
 
     }
 }
+
+// collectStar for player 2
+function collectStar_player2 (player2, star) {
+    star.disableBody(true, true);
+
+    //  Add and update the score
+    score_player2 += 10;
+    scoreText_player2.setText('p2 Score: ' + score_player2);
+
+    //this.growSound.play();
+    this.a_sound.play();
+
+    if (stars.countActive(true) === 0)
+    {
+        //  A new batch of stars to collect
+        stars.children.iterate(function (child) {
+
+            child.enableBody(true, child.x, 0, true, true);
+
+        });
+
+        var x = (score_player2.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+        var bomb = bombs.create(x, 16, 'bomb');
+        bomb.setBounce(1);
+        bomb.setCollideWorldBounds(true);
+        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        bomb.allowGravity = false;
+
+    }
+}
+
+
 
 
 function hitBomb (player, bomb)
