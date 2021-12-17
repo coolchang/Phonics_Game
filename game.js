@@ -128,7 +128,7 @@ class bootGame extends Phaser.Scene{
     
 
         this.load.audio('theme', [
-            'assets/audio/BG/Epic-Chase.mp3'
+            'assets/audio/BG/arcade-game-simple-background-music.mp3'
         ]);
 
         this.load.audio('scream',[
@@ -139,12 +139,13 @@ class bootGame extends Phaser.Scene{
     create(){
         this.scene.start("playGame");
 
-        var music = this.sound.add('theme');
+        var music = this.sound.add('theme', {volume: 0.4});
         
         console.log("TEST First window.innerWidth=", window.innerWidth);
 
 
-        //music.play();
+        music.play();
+        //music.play('volume', {volume: 0.5});
     }
 }
 
